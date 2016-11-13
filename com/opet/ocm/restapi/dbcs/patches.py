@@ -28,7 +28,7 @@ class Patches:
     )
     return r.headers['Location']
 
-  def precheckapplication(self,serviceId,patchId):
+  def precheck(self,serviceId,patchId):
     headers = {
       'Content-Type' : 'application/json',
       'X-ID-TENANT-NAME' : self.tenant 
@@ -41,13 +41,52 @@ class Patches:
     )
     return r.text
 
-  def rollback(self,serviceId,patchId):
+  def rollback(self,serviceId,rollbackId):
     headers = {
       'Content-Type' : 'application/json',
       'X-ID-TENANT-NAME' : self.tenant 
     }
-    r = requests.delete(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/'+patchId,
+    r = requests.put(
+      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/'+rollbackId+'/rollback',
+      headers=headers, 
+      auth=(self.tenant_user,self.tenant_users_password), 
+      verify=False
+    )
+    return r.text
+
+  def listavailable(self,serviceId):
+    headers = {
+      'Content-Type' : 'application/json',
+      'X-ID-TENANT-NAME' : self.tenant 
+    }
+    r = requests.get(
+      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/available',
+      headers=headers, 
+      auth=(self.tenant_user,self.tenant_users_password), 
+      verify=False
+    )
+    return r.text
+
+  def precheckhistory(self,serviceId):
+    headers = {
+      'Content-Type' : 'application/json',
+      'X-ID-TENANT-NAME' : self.tenant 
+    }
+    r = requests.get(
+      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/checks',
+      headers=headers, 
+      auth=(self.tenant_user,self.tenant_users_password), 
+      verify=False
+    )
+    return r.text
+
+  def applyrollbackhistory(self,serviceId):
+    headers = {
+      'Content-Type' : 'application/json',
+      'X-ID-TENANT-NAME' : self.tenant 
+    }
+    r = requests.get(
+      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/applied',
       headers=headers, 
       auth=(self.tenant_user,self.tenant_users_password), 
       verify=False

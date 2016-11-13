@@ -40,3 +40,16 @@ class ServiceInstances:
       verify=False
     )
     return r.text
+
+  def viewoperationjobstatus(self,requestName,jobId):
+    headers = {
+      'Content-Type' : 'application/json',
+      'X-ID-TENANT-NAME' : self.tenant 
+    }
+    r = requests.get(
+      self.uri+'/paas/service/dbcs/api/v1.1/instances/'+self.tenant+'/status/'+requestName+'/job/'+jobId, 
+      headers=headers, 
+      auth=(self.tenant_user,self.tenant_users_password), 
+      verify=False
+    )
+    return r.text
