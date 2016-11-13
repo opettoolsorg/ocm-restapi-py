@@ -1,107 +1,67 @@
 #!/usr/bin/env python
 
-# package com.opet.ocm.restapi.dbcs
+# package com.opet.ocm.restapi
 
-import requests
+import json
 
-class Patches:
-  def __init__(self,logger,tenant, user, password,uri):
-    self.logger = logger
-    self.tenant=tenant
-    self.tenant_user=user
-    self.tenant_users_password=password
-    self.uri = uri
+from com.opet.ocm.restapi.Base import Base
+ 
+# Facade
+class restapi:
+  factories={
+    'DBCS': {'module_name': 'com.opet.ocm.restapi.dbcs.DBCS', 'instance': None}, 
+    'CCS': {'module_name': 'com.opet.ocm.restapi.ccs.CCS', 'instance': None}
+  }
+  def __init__(self):
+    self.base=None
+    self.valid_values="DBCS,CCS"
 
-  def __call__(self,args):
-    self.__call__(args)
+  def register(self, api_list):
+    restapi.__validate__(self,api_list)
+    for i in range(len(api_list)):
+      name=api_list[i]
+      instance=restapi.factories[name]['instance']
+      if instance is None:
+        self.base=Base(name)
 
-  def apply(self,serviceId,forceApply):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.put(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/patchId?forceApply='+forceApply,
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.headers['Location']
+  def unregister(self, api_list):
+    pass
 
-  def precheck(self,serviceId,patchId):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.get(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/checks/'+patchId,
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.text
+  def use(self,name):
+    retval=restapi.factories[name]['instance']
+    if retval is None:
+      retval=self.__load__(name)
+      restapi.factories[name]['instance']=retval
+    return retval
 
-  def rollback(self,serviceId,rollbackId):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.put(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/'+rollbackId+'/rollback',
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.text
+  def list(self,name):
+    return self.valid_values
 
-  def listavailable(self,serviceId):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.get(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/available',
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.text
+  def toJson(self):
+    return self.__str__()
 
-  def precheckhistory(self,serviceId):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.get(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/checks',
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.text
+  def __str__(self):
+    retval=""
+    if self.base is not None:
+      retval=self.base.__str__()
+    return retval
 
-  def applyrollbackhistory(self,serviceId):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.get(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches/applied',
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.text
+  def __load__(self,name):
+    module = __import__(restapi.factories[name]['module_name'], fromlist=[name])
+    clazz = getattr(module, name)
+    return clazz()
 
-  def viewinformation(self,serviceId):
-    headers = {
-      'Content-Type' : 'application/json',
-      'X-ID-TENANT-NAME' : self.tenant 
-    }
-    r = requests.get(
-      self.uri+'/paas/api/v1.1/instancemgmt/'+self.tenant+'/services/dbaas/instances/'+serviceId+'/patches',
-      headers=headers, 
-      auth=(self.tenant_user,self.tenant_users_password), 
-      verify=False
-    )
-    return r.text
+  def __check__(self,name):
+    if name not in self.valid_values:
+      raise NameError("Unsupported REST API: "+name)
+    
+  def __validate__(self, arg):
+    if arg is None:
+      raise NameError("Argument cannot be None: arg")
+    elif isinstance(arg, list) == False:
+      raise NameError("Argument must be a list")
+    elif isinstance(arg[0], str) == False:
+      raise NameError("Argument must be a str")
+    else:
+      for i in range(len(arg)):
+        self.__check__(arg[i])
