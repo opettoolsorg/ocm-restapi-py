@@ -1,0 +1,18 @@
+{
+  "restapi": 
+  { 
+    "commands":[
+    {
+      "register":
+      {
+        "params":[{"name":"api_list","type":"list","description":"List of REST API names"}],
+        "description": "Register REST API(s) you want work with, using the specified list of strings"
+      }, 
+      "use":
+      {
+        "params":[{"name":"name","type":"string","description":"Name of REST API"}],
+        "description": "Obtain handle to the registered REST API to use"
+      }
+    }] 
+  }
+}

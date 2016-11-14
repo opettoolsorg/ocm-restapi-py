@@ -6,7 +6,8 @@ Python 2.7.10 (default, Jul 14 2015, 19:46:27)
 [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.39)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
 >>> from com.opet.ocm.restapi import restapi
->>> factory = restapi.restapi()
+>>> factory = restapi.restapi(interactive=True)
+>>> factory.help()
 >>> factory.register(["DBCS","CCS"])
 >>> dbcs = factory.use("DBCS")
 >>> dbcs.setCommon("tenant5","t5admin","t3nant-5","https://ocm14-psm-vip.us.osc.oracle.com")
