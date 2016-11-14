@@ -4,6 +4,7 @@
 
 import json
 
+from com.opet.utils.Help import Help
 from com.opet.ocm.restapi.Base import Base
  
 # Facade
@@ -38,11 +39,10 @@ class restapi:
   def list(self, name):
     return self.valid_values
 
-  def help(self):
-    from com.opet.utils.Help import Help
+  def help(self):    
     import os
-    help = Help.Help()
-    return help.load(os.path.abspath(__file__)+'/restapi.help')
+    help = Help()
+    return help.load(os.path.abspath(__file__).replace(".py",".help"))
 
   def toJson(self):
     return self.__str__()
