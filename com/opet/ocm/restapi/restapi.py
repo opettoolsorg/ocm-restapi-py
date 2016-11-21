@@ -7,7 +7,6 @@ import json, threading
 from com.opet.utils.Help import Help
 from com.opet.ocm.restapi.Base import Base
  
-# Facade
 class restapi:
   factories={
     'DBCS': {'module_name': 'com.opet.ocm.restapi.dbcs.DBCS', 'instance': None}, 
