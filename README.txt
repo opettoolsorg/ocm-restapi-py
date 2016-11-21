@@ -17,3 +17,4 @@ Type "help", "copyright", "credits" or "license" for more information.
 {"restapi": [{"tenant_users_password": "t3nant-5", "uri": "https://ocm14-psm-vip.us.osc.oracle.com", "tenant_user": "t5admin", "tenant": "tenant5", "name": "DBCS"}, {"tenant_users_password": "t3nant-5", "uri": "https://ocm14api.us.osc.oracle.com", "tenant_user": "t5user", "tenant": "tenant5", "name": "CCS"}]}
 >>> dbcs.sshkeys.viewselecteddetails("AD-INTEG")
 >>> dbcs.patches.listavailable("AD-INTEG")
+>>> dbcs.precheckhistory("AD-INTEG")
