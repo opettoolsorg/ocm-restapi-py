@@ -2,7 +2,7 @@
 
 # package com.opet.ocm.restapi
 
-import json
+import json, threading
 
 from com.opet.utils.Help import Help
 from com.opet.ocm.restapi.Base import Base
@@ -15,6 +15,7 @@ class restapi:
   }
   def __init__(self,interactive=False):
     self.base = None
+    self.lock = threading.Lock()
     self.interactive = interactive
     self.valid_values = "DBCS,CCS"
 
@@ -27,13 +28,22 @@ class restapi:
         self.base=Base(name)
 
   def unregister(self, api_list):
-    pass
+    restapi.__validate__(self, api_list)
+    for i in range(len(api_list)):
+      name = api_list[i]
+      instance = restapi.factories[name]['instance']
+      if instance is not None:
+        self.lock.acquire()
+        restapi.factories[name]['instance'] = None
+        self.lock.release()
 
   def use(self, name):
     retval = restapi.factories[name]['instance']
     if retval is None:
       retval = self.__load__(name)
+      self.lock.acquire()
       restapi.factories[name]['instance'] = retval
+      self.lock.release()
     return retval
 
   def list(self, name):

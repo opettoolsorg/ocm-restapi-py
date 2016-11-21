@@ -20,29 +20,29 @@ class Base:
     }
     api_list.append(entry)
 
-  def __setCommon__(self,name, tenant, tenant_user, tenant_users_password):
-    api = self.__get__(name)
+  def __setCommon__(self, tenant, tenant_user, tenant_users_password):
+    api = self.name
     api['tenant'] = tenant
     api['tenant_user'] = tenant_user
     api['tenant_users_password'] = tenant_users_password
 
-  def __update__(self, name, key_name, key_value):
-    api = self.__get__(name)
+  def __update__(self, key_name, key_value):
+    api = self.name
     api[key_name] = key_value
 
-  def __remove__(self, name):
-    api = self.__get__(name)
+  def __remove__(self):
+    api = self.name
     del api
 
-  def __get__(self, name):
+  def __get__(self):
     api_list = Base.restapis['restapi']
     api = None
     for i in range(len(api_list)):
-      if api_list[i]['name'] == name:
+      if api_list[i]['name'] == self.name:
         api = api_list[i]
 
     if api is None:
-      raise NameError("No REST API registered with given name: "+name)
+      raise NameError("No REST API registered with given name: "+self.name)
 
     return api
     

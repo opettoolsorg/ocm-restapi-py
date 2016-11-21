@@ -1,76 +1,124 @@
+"""
+logger.py
+"""
+
 #!/usr/bin/env python
 
 # package com.opet.logging
 
-import sys
 import os
 import datetime
-import pytz 
+
 from pytz import timezone
 
-SEVERITY_LEVEL=None
-TZ='US/Pacific'
+class Logger(object):
+    """
+    Logger
+    """
+    def __init__(self):
+        self._severity_level = None
+        self._tz = 'US/Pacific'
 
-def getSeverityName(search_var):
-  retval="UNKNOWN"
+    def getSeverityName(self, level):
+        """
+        Get severity name associated with a given severity level
+        Args:
+            level: Number associated with severity level
 
-  if search_var == 0:
-    retval="ERROR"
-  elif search_var == 1:
-    retval="WARN"
-  elif search_var == 2:
-    retval="INFO"
-  elif search_var == 3:
-    retval="TRACE"
-  return retval
+        Returns:
+            String
+        """
+        retval = 'UNKNOWN'
 
-def setSeverityLevel(level):
-  global SEVERITY_LEVEL
+        if level == 0:
+            retval = "ERROR"
+        elif level == 1:
+            retval = "WARN"
+        elif level == 2:
+            retval = "INFO"
+        elif level == 3:
+            retval = "TRACE"
+        return retval
 
-  _tmp=getSeverityName(level)
-  if _tmp == "UNKNOWN":
-    log("INFO","setSeverityLevel","Invalid argument specified: " + level)
-  else:
-    SEVERITY_LEVEL=level
+    def setSeverityLevel(self, level):
+        """
+        Set severity level to specified value
+        Args:
+            level: Number associated with severity level
 
-  log("INFO","setSeverityLevel","SEVERITY_LEVEL=" + getSeverityName(SEVERITY_LEVEL))
+        """
+        _tmp = self.getSeverityName(level)
+        if _tmp == "UNKNOWN":
+            self.log("INFO", "setSeverityLevel", "Invalid argument specified: " + level)
+        else:
+            self._severity_level = level
 
-def getSeverityLevel():
-  global SEVERITY_LEVEL
-  return getSeverityName(SEVERITY_LEVEL)
+        self.log(
+            "INFO",
+            "setSeverityLevel",
+            "severity_level=" + self.getSeverityName(self._severity_level))
 
-def setTimezone(tzname):
-  global TZ
-  TZ = tzname
-  log("INFO","setTimezone","TZ=" + tzname)
+    def getSeverityLevel(self):
+        """
+        Get name associated with current severity level
+        Returns:
+            String
+        """
+        return self.getSeverityName(self._severity_level)
 
-def getTimezone():
-  global TZ
-  return TZ
+    def setTimezone(self, tzname):
+        """
+        Set timezone to specified value
+        Args:
+            _tzname: String associated with timezone
+        """
+        self._tz = tzname
+        self.log("INFO", "setTimezone", "_tz=" + tzname)
 
-def log(severity,function_name,message):
-  global SEVERITY_LEVEL
-  global TZ
+    def getTimezone(self):
+        """
+        Get current timezone
+        Returns:
+            String
+        """
+        return self._tz
 
-  if severity == "ERROR":
-    _SL=0
-  elif severity == "WARN":
-    _SL=1
-  elif severity == "INFO":
-    _SL=2
-  elif severity == "TRACE":
-    _SL=3
-  else:
-    _SL=99
+    def log(self, severity, function_name, message):
+        """
+        Log a message for the specified function, using the specified severity
+        Args:
+            severity: Name of severity level
+            function_name: Name of function or function signature
+            message: Message to log
+        """
+        if severity == "ERROR":
+            _sl = 0
+        elif severity == "WARN":
+            _sl = 1
+        elif severity == "INFO":
+            _sl = 2
+        elif severity == "TRACE":
+            _sl = 3
+        else:
+            _sl = 99
 
-  if _SL <= SEVERITY_LEVEL:
-    print "%s %s <%s> %s" % (datetime.datetime.now(timezone(TZ)).strftime("%a %b %d %H:%M:%S %Z %Y"),severity,function_name,message)
+        if _sl <= self._severity_level:
+            print "%s %s <%s> %s" % (
+                datetime.datetime.now(timezone(self._tz)).strftime("%a %b %d %H:%M:%S %Z %Y"),
+                severity, function_name, message)
 
-def main():
-  global SEVERITY_LEVEL
-  log("INFO","logging","OPET_LOGGING_SEVERITY_LEVEL=" + os.environ.get('OPET_LOGGING_SEVERITY_LEVEL'))
-  # 0=ERROR,1=WARN,2=INFO,3=TRACE
-  SEVERITY_LEVEL=os.getenv('OPET_LOGGING_SEVERITY_LEVEL',2)
+    def main(self):
+        """
+        main
+        """
+        logger = Logger()
+        logger.log(
+            "INFO",
+            "logging",
+            "OPET_LOGGING__severity_level=" + os.environ.get('OPET_LOGGING__severity_level')
+        )
+        # 0=ERROR,1=WARN,2=INFO,3=TRACE
+        logger.setSeverityLevel(os.getenv('OPET_LOGGING__severity_level', 2))
 
-if __name__ == "__main__":
-  main()
+        if __name__ == "__main__":
+            self.main()
